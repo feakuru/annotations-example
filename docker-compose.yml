@@ -19,6 +19,7 @@ services:
       - db
     volumes:
       - static_files:/annotations/static
+      - media_files:/annotations/media
     environment:
       - ANNOTATIONS_DB_NAME=annotations
       - ANNOTATIONS_DB_USER=annotations_user
@@ -28,6 +29,7 @@ services:
     build: ./nginx
     volumes:
       - static_files:/annotations/static
+      - media_files:/annotations/media
     ports:
       - 1337:80
     depends_on:
@@ -36,3 +38,4 @@ services:
 volumes:
   postgres_data:
   static_files:
+  media_files:
