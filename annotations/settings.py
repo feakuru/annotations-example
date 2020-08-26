@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'images',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
