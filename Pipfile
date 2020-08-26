@@ -12,6 +12,7 @@ django = "*"
 djangorestframework = "*"
 gunicorn = "*"
 psycopg2 = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.8"
