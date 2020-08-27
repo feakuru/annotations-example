@@ -4,8 +4,7 @@ from . import models
 
 
 class ExternalLabelSerializer(serializers.ModelSerializer):
-    surface = serializers.CharField(source='get_surface_as_str')
-
+    
     class Meta:
         model = models.Label
         fields = [
@@ -15,7 +14,21 @@ class ExternalLabelSerializer(serializers.ModelSerializer):
         ]
 
 
-class InternalLabelSerializer(serializers.ModelSerializer):
+class LabelSerializer(serializers.ModelSerializer):
+
+    def get_fields(self):
+        base_fields = super().get_fields()
+
+        label_format = self.context['request'].query_params.get('format', 'external')
+
+        if label_format == 'internal':
+            return base_fields
+        else:
+            base_fields.pop('shape')
+            base_fields['surface'] = serializers.CharField(source='get_surface_as_str')
+            return base_fields
+
+
     class Meta:
         model = models.Label
         fields = [
@@ -27,14 +40,7 @@ class InternalLabelSerializer(serializers.ModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        if kwargs.get('labels_format', 'external') == 'external':
-            self.labels = serializers.ListField(child=ExternalLabelSerializer())
-        else:
-            self.labels = serializers.ListField(child=InternalLabelSerializer())
-        if 'labels_format' in kwargs:
-            del kwargs['labels_format']
-        return super(AnnotationSerializer, self).__init__(*args, **kwargs)
+    labels = LabelSerializer(many=True)
 
     class Meta:
         model = models.Annotation
