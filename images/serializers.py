@@ -27,11 +27,13 @@ class InternalLabelSerializer(serializers.ModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-    def __init__(self, labels_format='external', *args, **kwargs):
-        if labels_format == 'external':
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('labels_format', 'external') == 'external':
             self.labels = serializers.ListField(child=ExternalLabelSerializer())
         else:
             self.labels = serializers.ListField(child=InternalLabelSerializer())
+        if 'labels_format' in kwargs:
+            del kwargs['labels_format']
         return super(AnnotationSerializer, self).__init__(*args, **kwargs)
 
     class Meta:
@@ -45,6 +47,7 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Image
         fields = [
+            'id',
             'image',
             'annotation',
         ]
