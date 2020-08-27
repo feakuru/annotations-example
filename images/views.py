@@ -17,12 +17,23 @@ class ImageViewSet(viewsets.ModelViewSet):
     def annotation(self, request, pk):
         image = self.get_object()
         if request.method == 'GET':
-            return Response(
-                serializers.AnnotationSerializer(image.annotation).data
-            )
+            if image.annotation is not None:
+                return Response(
+                    serializers.AnnotationSerializer(
+                        image.annotation,
+                        context={'request': request}
+                    ).data
+                )
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            serializer = serializers.AnnotationSerializer(data=request.data)
+            serializer = serializers.AnnotationSerializer(
+                data=request.data,
+                context={'request': request}
+            )
             if serializer.is_valid():
+                image.annotation.delete()
+                image.annotation = serializer.save()
                 return Response(serializer.data)
             else:
                 return Response(
