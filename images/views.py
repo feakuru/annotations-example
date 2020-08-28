@@ -15,7 +15,9 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def annotation(self, request, pk):
+        """Fetch or update (replace, really) the image's annotation."""
         image = self.get_object()
+
         if request.method == 'GET':
             if image.annotation is not None:
                 return Response(
@@ -26,24 +28,30 @@ class ImageViewSet(viewsets.ModelViewSet):
                 )
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND)
+
         else:
             serializer = serializers.AnnotationSerializer(
                 data=request.data,
                 context={'request': request}
             )
+
             if serializer.is_valid():
                 old_annotation = image.annotation
+
                 image.annotation = serializer.save()
                 image.save()
+
                 if old_annotation is not None:
                     old_annotation.labels.all().delete()
                     old_annotation.delete()
+
                 return Response(
                     serializers.AnnotationSerializer(
                         image.annotation,
                         context={'request': request}
                     ).data,
                 )
+
             else:
                 return Response(
                     serializer.errors,

@@ -28,6 +28,9 @@ class ShapeField(serializers.Field):
 
 
 class LabelMetaSerializer(serializers.ModelSerializer):
+    """
+    Serializer validating that confidence_percent is in the [0, 1] range.
+    """
     confidence_percent = serializers.FloatField(
         validators=[
             validators.MinValueValidator(
@@ -50,6 +53,7 @@ class LabelMetaSerializer(serializers.ModelSerializer):
 
 
 class LabelSerializer(serializers.ModelSerializer):
+    """Serializer for Label that works in both internal and external formats."""
     shape = ShapeField()
     meta = LabelMetaSerializer()
 
@@ -131,6 +135,7 @@ class LabelsField(serializers.Field):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
+    """Annotation serializer that handles the labels MTM field."""
     labels = LabelsField()
 
     def create(self, validated_data):
@@ -147,6 +152,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
         ]
 
 class ImageSerializer(serializers.ModelSerializer):
+    """Serializer for an Image that creates an annotation if provided."""
     image = base64_fields.Base64ImageField()
     annotation = AnnotationSerializer(required=False)
 

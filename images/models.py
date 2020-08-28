@@ -4,6 +4,9 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Image(models.Model):
+    """
+    An annotated Image.
+    """
     image = models.ImageField()
     annotation = models.OneToOneField(
         'images.Annotation',
@@ -14,6 +17,9 @@ class Image(models.Model):
 
 
 class Annotation(models.Model):
+    """
+    An Annotation for an Image consisting of multiple labels.
+    """
     labels = models.ManyToManyField(
         'images.Label',
         blank=True,
@@ -23,6 +29,9 @@ class Annotation(models.Model):
 LABEL_CLASS_ID_CHOICES = ('tooth', 'gum', 'lip')
 
 class Label(models.Model):
+    """
+    A Label containing some example ML model info.
+    """
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -44,10 +53,16 @@ class Label(models.Model):
     )
 
     def get_surface_as_str(self):
+        """Return `surface` as a joined string."""
         return ''.join(elt for elt in self.surface)
 
 
 class LabelMeta(models.Model):
+    """
+    Meta info on a Label
+    representing if it is confirmed
+    and how confident we are about it.
+    """
     label = models.OneToOneField('Label', related_name='meta', on_delete=models.CASCADE)
     confirmed = models.BooleanField(default=False)
     confidence_percent = models.FloatField()
