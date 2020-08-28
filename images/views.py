@@ -35,7 +35,9 @@ class ImageViewSet(viewsets.ModelViewSet):
                 old_annotation = image.annotation
                 image.annotation = serializer.save()
                 image.save()
-                old_annotation.delete()
+                if old_annotation is not None:
+                    old_annotation.labels.all().delete()
+                    old_annotation.delete()
                 return Response(
                     serializers.AnnotationSerializer(
                         image.annotation,
