@@ -32,8 +32,16 @@ class Label(models.Model):
     class_id = models.TextField(
         choices=[(item, item) for item in LABEL_CLASS_ID_CHOICES],
     )
-    surface = ArrayField(models.CharField(max_length=1))
-    shape = ArrayField(models.FloatField(), size=4)
+    surface = ArrayField(
+        models.CharField(max_length=1),
+        null=True,
+        blank=True,
+    )
+    shape = ArrayField(
+        models.FloatField(), size=4,
+        null=True,
+        blank=True,
+    )
 
     def get_surface_as_str(self):
         return ''.join(elt for elt in self.surface)
