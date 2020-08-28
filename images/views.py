@@ -36,7 +36,12 @@ class ImageViewSet(viewsets.ModelViewSet):
                 image.annotation = serializer.save()
                 image.save()
                 old_annotation.delete()
-                return Response(serializer.data)
+                return Response(
+                    serializers.AnnotationSerializer(
+                        image.annotation,
+                        context={'request': request}
+                    ).data,
+                )
             else:
                 return Response(
                     serializer.errors,
