@@ -9,12 +9,15 @@ This project's virtual environment is set up using [pipenv](https://github.com/p
 
 The project is set up following a [manual](https://medium.com/@feakuru/dockerizing-django-7246ccda9fb3) on Dockerizing Django projects written by me. The docker-compose setup features three containers: the app itself, the Postgres DB which is not exposed to the outer world and a nginx proxy. Static files and Postgres data are kept on volumes which are preserved between restarts.
 
-When launched with `docker-compose up`, the project will be available on port 1337.
+When launched with `docker-compose up`, the project will set itself up and be available on port 1337.
+
+I have included a prefill script that runs as part of `docker-compose up` and generates two example images hust to demonstrate how I would handle prefilling some test data into the database if needed.
 
 
 ## Implementation
 
 The code is briefly documented via docstrings. This section describes only the endpoint structure of the implementation. All of the described endpoints make use of the `format` query parameter which distinguishes between two formats of annotation representation:
+
 - internal, like this:
 ```json
   {
@@ -36,7 +39,8 @@ The code is briefly documented via docstrings. This section describes only the e
     ]
   }
 ```
-- external, like this:
+
+- external (will only show labels with `meta.confirmed == true`), like this:
 ```json
   {
     "labels": [
@@ -48,6 +52,8 @@ The code is briefly documented via docstrings. This section describes only the e
     ]
   }
 ```
+
+The URLs of the images, as well as the endpoints itself, are deliberately NOT auth-protected and can be accessed from the outside world, as well as used in browser.
 
 ### `/images/` endpoint
 
