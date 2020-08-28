@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_base64 import fields as base64_fields
 from django.core import validators
 
 from . import models
@@ -146,7 +147,19 @@ class AnnotationSerializer(serializers.ModelSerializer):
         ]
 
 class ImageSerializer(serializers.ModelSerializer):
+    image = base64_fields.Base64ImageField()
     annotation = AnnotationSerializer(required=False)
+
+    def create(self, validated_data):
+        image = models.Image.objects.create(image=validated_data['image'])
+        annotation_data = validated_data.get('annotation', {})
+        if annotation_data:
+            image.annotation = models.Annotation.objects.create()
+            image.annotation.labels.set(annotation_data.get('labels', []))
+            image.annotation.save()
+            image.save()
+        return image
+
 
     class Meta:
         model = models.Image
