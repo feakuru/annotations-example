@@ -37,3 +37,9 @@ class Label(models.Model):
 
     def get_surface_as_str(self):
         return ''.join(elt for elt in self.surface)
+
+
+class LabelMeta(models.Model):
+    label = models.OneToOneField('Label', related_name='meta', on_delete=models.CASCADE)
+    confirmed = models.BooleanField(default=False)
+    confidence_percent = models.FloatField()
