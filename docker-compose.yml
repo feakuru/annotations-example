@@ -8,6 +8,23 @@ services:
       - POSTGRES_DB=annotations
       - POSTGRES_USER=annotations_user
       - POSTGRES_PASSWORD=cant_hack_me_im_not_exposed
+  setup:
+    build: .
+    command: ./setup.sh
+    env_file:
+     - ./.annotations_env
+    expose:
+      - 8000
+    depends_on:
+      - db
+    volumes:
+      - static_files:/annotations/static
+      - media_files:/annotations/media
+    environment:
+      - ANNOTATIONS_DB_NAME=annotations
+      - ANNOTATIONS_DB_USER=annotations_user
+      - ANNOTATIONS_DB_PASSWORD=cant_hack_me_im_not_exposed
+      - ANNOTATIONS_DB_HOST=db
   web:
     build: .
     command: gunicorn annotations.wsgi:application --bind 0.0.0.0:8000
@@ -17,6 +34,7 @@ services:
       - 8000
     depends_on:
       - db
+      - setup
     volumes:
       - static_files:/annotations/static
       - media_files:/annotations/media
