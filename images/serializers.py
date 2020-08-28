@@ -64,9 +64,22 @@ class LabelSerializer(serializers.ModelSerializer):
             base_fields.pop('shape')
             base_fields['surface'] = serializers.CharField(
                 source='get_surface_as_str',
-                read_only=True,
             )
             return base_fields
+    
+    def create(self, validated_data):
+        meta_data = validated_data.pop(
+            'meta',
+            {
+                'confirmed': False,
+                'confidence_percent': 0.00
+            }
+        )
+        if 'get_surface_as_str' in validated_data:
+            validated_data['surface'] = list(validated_data.pop('get_surface_as_str'))
+        label = models.Label.objects.create(**validated_data)
+        models.LabelMeta.objects.create(label=label, **meta_data)
+        return label
 
 
     class Meta:
@@ -134,6 +147,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
     annotation = AnnotationSerializer(required=False)
+
     class Meta:
         model = models.Image
         fields = [
